@@ -26,7 +26,6 @@ def main():
         """
         Display the given error message.
 
-        :param blessed.terminal.Terminal term: The user's terminal
         :param str message: The error message to display:
         """
 
