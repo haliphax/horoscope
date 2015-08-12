@@ -38,6 +38,7 @@ def main():
         Return the user's sign or let them choose one using a Lightbar.
 
         :param bool force: If True, does not retrive the user's sign from the db
+        :rtype: :class:`str`
         """
 
         database = DBProxy('astrology')
@@ -87,6 +88,8 @@ def main():
     def get_horoscope(sign):
         """
         Retrieve the horoscope for the user's selected astrological sign.
+
+        :rtype: :class:`str`
         """
 
         req = None
