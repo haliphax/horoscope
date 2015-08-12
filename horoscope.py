@@ -20,6 +20,8 @@ SIGNS = ('Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo', 'Libra',
          'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces',)
 
 # pylint: disable=I0011,R0912
+
+
 def main():
     """ Script entry point. """
 
@@ -87,6 +89,7 @@ def main():
         """
         Retrieve the horoscope for the user's selected astrological sign.
 
+        :param str sign: The user's astrological sign
         :rtype: :class:`str`
         """
 
@@ -112,7 +115,6 @@ def main():
                 response = json.loads(req.text)
             except TypeError:
                 return error_message(u'Error parsing response.')
-
 
             with database:
                 try:
@@ -155,9 +157,12 @@ def main():
     daily = u'Today: {horoscope}'.format(horoscope=horoscope['daily'])
     weekly = u'This week: {horoscope}'.format(horoscope=horoscope['weekly'])
     monthly = u'This month: {horoscope}'.format(horoscope=horoscope['monthly'])
+    # TODO detect overflow and use pager_prompt
     echo(u''.join((term.normal, term.clear, u'\r\n', sign[0].upper(), sign[1:],
                    u'\r\n', term.blue(u'-' * len(sign)), u'\r\n',
-                   u'\r\n'.join(term.wrap(daily, term.width - 1)), u'\r\n\r\n',
-                   u'\r\n'.join(term.wrap(weekly, term.width - 1)), u'\r\n\r\n',
+                   u'\r\n'.join(term.wrap(daily, term.width - 1)),
+                   u'\r\n\r\n',
+                   u'\r\n'.join(term.wrap(weekly, term.width - 1)),
+                   u'\r\n\r\n',
                    u'\r\n'.join(term.wrap(monthly, term.width - 1)))))
     input_prompt()
