@@ -24,7 +24,7 @@ def main():
 
     def error_message(message):
         """
-        Clear the screen and display the given error message.
+        Display the given error message.
 
         :param blessed.terminal.Terminal term: The user's terminal
         :param str message: The error message to display:
