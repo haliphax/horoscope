@@ -26,7 +26,7 @@ def main():
         """
         Display the given error message.
 
-        :param str message: The error message to display:
+        :param str message: The error message to display
         """
 
         echo(u''.join((term.normal, u'\r\n', message)))
