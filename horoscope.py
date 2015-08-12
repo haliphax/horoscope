@@ -2,12 +2,13 @@
 Horoscope module for x/84 bbs.
 
 Lets a user choose their astrological sign and retrieves their daily
-horoscope from the fabulously40.com web API.
+horoscope from the littleastro.com web API.
 """
 __author__ = u'haliphax <https://github.com/haliphax>'
 
 # stdlib
 import json
+from datetime import date
 
 # 3rd party
 import requests
@@ -15,6 +16,8 @@ import requests
 # local
 from x84.bbs import getterminal, getsession, echo, Lightbar, DBProxy, getch
 
+SIGNS = ('Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo', 'Libra',
+         'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces',)
 
 # pylint: disable=I0011,R0912
 def main():
@@ -40,7 +43,7 @@ def main():
         :rtype: :class:`str`
         """
 
-        database = DBProxy('astrology')
+        database = DBProxy('astrology', table='users')
 
         if not force and session.user.handle in database:
             return database[session.user.handle]
@@ -57,11 +60,7 @@ def main():
         def refresh():
             """ Refresh the lightbar. """
             echo(u''.join((term.normal, term.clear)))
-            contents = ((key, key) for key in ('aries', 'taurus', 'gemini',
-                                               'cancer', 'leo', 'virgo',
-                                               'libra', 'scorpio',
-                                               'sagittarius', 'capricorn',
-                                               'aquarius', 'pisces'))
+            contents = ((key, key) for key in SIGNS)
             lbar.update(contents)
             echo(u''.join([lbar.border(), lbar.refresh()]))
 
@@ -91,28 +90,41 @@ def main():
         :rtype: :class:`str`
         """
 
-        req = None
+        database = DBProxy('astrology', table='horoscope')
+        nowdate = date.today()
 
-        try:
-            req = requests.get(
-                'http://widgets.fabulously40.com/horoscope.json?sign={sign}'
-                .format(sign=sign))
-        except requests.exceptions.RequestException:
-            return error_message(u'Error retrieving horoscope.')
+        if 'horoscope' not in database:
+            database['horoscope'] = {'date': None}
 
-        response = None
+        if database['horoscope']['date'] != nowdate:
+            req = None
 
-        try:
-            response = json.loads(req.text)
-        except TypeError:
-            return error_message(u'Error parsing response.')
+            try:
+                req = requests.get(
+                    'http://www.api.littleastro.com/restserver/index.php'
+                    '/api/horoscope/readings/format/json')
+            except requests.exceptions.RequestException:
+                return error_message(u'Error retrieving horoscope.')
 
-        try:
-            horoscope = response['horoscope']['horoscope']
-        except KeyError:
-            return error_message(u'Invalid response.')
+            response = None
 
-        return horoscope
+            try:
+                response = json.loads(req.text)
+            except TypeError:
+                return error_message(u'Error parsing response.')
+
+
+            with database:
+                try:
+                    for element in response:
+                        horoscope = {'daily': element['Daily_Horoscope'],
+                                     'weekly': element['Weekly_Horoscope'],
+                                     'monthly': element['Monthly_Horoscope']}
+                        database[element['Sign']] = horoscope
+                except KeyError:
+                    return error_message(u'Invalid response.')
+
+        return database[sign]
 
     def input_prompt():
         """
@@ -140,7 +152,12 @@ def main():
     if not horoscope:
         return
 
+    daily = u'Today: {horoscope}'.format(horoscope=horoscope['daily'])
+    weekly = u'This week: {horoscope}'.format(horoscope=horoscope['weekly'])
+    monthly = u'This month: {horoscope}'.format(horoscope=horoscope['monthly'])
     echo(u''.join((term.normal, term.clear, u'\r\n', sign[0].upper(), sign[1:],
                    u'\r\n', term.blue(u'-' * len(sign)), u'\r\n',
-                   u'\r\n'.join(term.wrap(horoscope, term.width - 1)))))
+                   u'\r\n'.join(term.wrap(daily, term.width - 1)), u'\r\n\r\n',
+                   u'\r\n'.join(term.wrap(weekly, term.width - 1)), u'\r\n\r\n',
+                   u'\r\n'.join(term.wrap(monthly, term.width - 1)))))
     input_prompt()
