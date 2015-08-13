@@ -20,8 +20,6 @@ SIGNS = ('Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo', 'Libra',
          'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces',)
 
 # pylint: disable=I0011,R0912
-
-
 def main():
     """ Script entry point. """
 
@@ -125,6 +123,8 @@ def main():
                         database[element['Sign']] = horoscope
                 except KeyError:
                     return error_message(u'Invalid response.')
+
+            database['horoscope']['date'] = nowdate
 
         return database[sign]
 
