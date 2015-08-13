@@ -154,9 +154,15 @@ def main():
     if not horoscope:
         return
 
-    daily = u'Today: {horoscope}'.format(horoscope=horoscope['daily'])
-    weekly = u'This week: {horoscope}'.format(horoscope=horoscope['weekly'])
-    monthly = u'This month: {horoscope}'.format(horoscope=horoscope['monthly'])
+    daily = u'{period} {horoscope}' \
+            .format(period=term.bright_white('Today:'),
+                    horoscope=horoscope['daily'])
+    weekly = u'{period} {horoscope}' \
+             .format(period=term.bright_white('This week:'),
+                     horoscope=horoscope['weekly'])
+    monthly = u'{period} {horoscope}' \
+              .format(period=term.bright_white('This month:'),
+                      horoscope=horoscope['monthly'])
     # TODO detect overflow and use pager_prompt
     echo(u''.join((term.normal, term.clear, u'\r\n', sign[0].upper(), sign[1:],
                    u'\r\n', term.blue(u'-' * len(sign)), u'\r\n',
