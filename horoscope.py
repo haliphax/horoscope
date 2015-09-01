@@ -15,10 +15,33 @@ import requests
 
 # local
 from x84.bbs import getterminal, getsession, echo, Lightbar, DBProxy, getch
+from x84.bbs.ini import get_ini
 from common import prompt_pager
+
+# ini settings
+PROMPT_LOWLIGHT_COLOR = get_ini('horoscope', 'prompt_lowlight_color') or \
+    u'bright_blue'
+PROMPT_HIGHLIGHT_COLOR = get_ini('horoscope', 'prompt_highlight_color') or \
+    u'bright_white'
+LIGHTBAR_BORDER_COLOR = get_ini('horoscope', 'lightbar_border_color') or \
+    u'blue'
+LIGHTBAR_LOWLIGHT_COLOR = get_ini('horoscope', 'lightbar_item_color') or \
+    u'white'
+LIGHTBAR_HIGHLIGHT_COLOR = get_ini('horoscope', 'lightbar_highlight_color') or \
+    u'bright_white_on_blue'
+HEADER_HIGHLIGHT_COLOR = get_ini('horoscope', 'header_highlight_color') or \
+    u'white'
+HEADER_LOWLIGHT_COLOR = get_ini('horoscope', 'header_lowlight_color') or \
+    u'blue'
+TEXT_HIGHLIGHT_COLOR = get_ini('horoscope', 'text_highlight_color') or \
+    u'bright_white'
+TEXT_LOWLIGHT_COLOR = get_ini('horoscope', 'text_lowlight_color') or \
+    u'white'
 
 SIGNS = ('Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo', 'Libra',
          'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces',)
+
+
 
 # pylint: disable=I0011,R0912
 def main():
@@ -51,8 +74,11 @@ def main():
 
         lbar = Lightbar(width=15, height=14, xloc=max(term.width / 2 - 7, 0),
                         yloc=max(term.height / 2 - 7, 0),
-                        colors={'border': term.blue,
-                                'highlight': term.bright_white_on_blue},
+                        colors={'border': getattr(term, LIGHTBAR_BORDER_COLOR),
+                                'highlight': getattr(term,
+                                                     LIGHTBAR_HIGHLIGHT_COLOR),
+                                'lowlight': getattr(term,
+                                                    LIGHTBAR_LOWLIGHT_COLOR)},
                         glyphs={'top-left': u'+', 'top-right': u'+',
                                 'top-horiz': u'-', 'bot-horiz': u'-',
                                 'bot-left': u'+', 'bot-right': u'+',
@@ -136,11 +162,12 @@ def main():
 
         echo(u''.join((term.normal, u'\r\n\r\n',
                        term.move_x(max(term.width / 2 - 40, 0)),
-                       term.bright_blue(u'Press '),
-                       term.bright_white(u'!'),
-                       term.bright_blue(u' to change your sign or '),
-                       term.bright_white(u'any other key'),
-                       term.bright_blue(u' to continue'))))
+                       getattr(term, PROMPT_LOWLIGHT_COLOR)(u'Press '),
+                       getattr(term, PROMPT_HIGHLIGHT_COLOR)(u'!'),
+                       getattr(term, PROMPT_LOWLIGHT_COLOR)(
+                           u' to change your sign or '),
+                       getattr(term, PROMPT_HIGHLIGHT_COLOR)(u'any other key'),
+                       getattr(term, PROMPT_LOWLIGHT_COLOR)(u' to continue'))))
         inp = getch()
 
         if inp == u'!':
@@ -158,21 +185,28 @@ def main():
         return
 
     daily = u'{period} {horoscope}' \
-            .format(period=term.bright_white('Today:'),
-                    horoscope=horoscope['daily'])
+            .format(period=getattr(term, TEXT_HIGHLIGHT_COLOR)('Today:'),
+                    horoscope=getattr(term, TEXT_LOWLIGHT_COLOR)(
+                        horoscope['daily']))
     weekly = u'{period} {horoscope}' \
-             .format(period=term.bright_white('This week:'),
-                     horoscope=horoscope['weekly'])
+             .format(period=getattr(term, TEXT_HIGHLIGHT_COLOR)('This week:'),
+                     horoscope=getattr(term, TEXT_LOWLIGHT_COLOR)(
+                         horoscope['weekly']))
     monthly = u'{period} {horoscope}' \
-              .format(period=term.bright_white('This month:'),
-                      horoscope=horoscope['monthly'])
+              .format(period=getattr(term, TEXT_HIGHLIGHT_COLOR)('This month:'),
+                      horoscope=getattr(term, TEXT_LOWLIGHT_COLOR)(
+                          horoscope['monthly']))
     echo(u''.join((term.normal, term.clear)))
-    output = u''.join((u'\r\n', sign[0].upper(), sign[1:], u'\r\n',
-                       term.blue(u'-' * len(sign)), u'\r\n',
+    output = u''.join((u'\r\n',
+                       getattr(term, HEADER_HIGHLIGHT_COLOR)(
+                           u''.join((sign[0].upper(), sign[1:]))),
+                       u'\r\n',
+                       getattr(term, HEADER_LOWLIGHT_COLOR)(u'-' * len(sign)),
+                       u'\r\n',
                        daily, u'\r\n\r\n',
                        weekly, u'\r\n\r\n',
                        monthly)).splitlines()
     prompt_pager(output, end_prompt=False, width=min(term.width - 1, 80),
-                 colors={'highlight': term.bright_white,
-                         'lowlight': term.bright_blue})
+                 colors={'highlight': getattr(term, PROMPT_HIGHLIGHT_COLOR),
+                         'lowlight': getattr(term, PROMPT_LOWLIGHT_COLOR)})
     input_prompt()
