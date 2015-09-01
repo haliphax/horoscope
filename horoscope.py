@@ -134,7 +134,9 @@ def main():
         Quit on input or allow the user to change their astrological sign.
         """
 
-        echo(u''.join((term.normal, u'\r\n\r\n', term.bright_blue(u'Press '),
+        echo(u''.join((term.normal, u'\r\n\r\n',
+                       term.move_x(max(term.width / 2 - 40, 0)),
+                       term.bright_blue(u'Press '),
                        term.bright_white(u'!'),
                        term.bright_blue(u' to change your sign or '),
                        term.bright_white(u'any other key'),
@@ -170,7 +172,7 @@ def main():
                        daily, u'\r\n\r\n',
                        weekly, u'\r\n\r\n',
                        monthly)).splitlines()
-    prompt_pager(output, end_prompt=False,
+    prompt_pager(output, end_prompt=False, width=min(term.width - 1, 80),
                  colors={'highlight': term.bright_white,
                          'lowlight': term.bright_blue})
     input_prompt()
