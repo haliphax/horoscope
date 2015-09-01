@@ -25,7 +25,7 @@ PROMPT_HIGHLIGHT_COLOR = get_ini('horoscope', 'prompt_highlight_color') or \
     u'bright_white'
 LIGHTBAR_BORDER_COLOR = get_ini('horoscope', 'lightbar_border_color') or \
     u'blue'
-LIGHTBAR_LOWLIGHT_COLOR = get_ini('horoscope', 'lightbar_item_color') or \
+LIGHTBAR_LOWLIGHT_COLOR = get_ini('horoscope', 'lightbar_lowlight_color') or \
     u'white'
 LIGHTBAR_HIGHLIGHT_COLOR = get_ini('horoscope', 'lightbar_highlight_color') or \
     u'bright_white_on_blue'

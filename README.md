@@ -15,7 +15,7 @@ You can use the following options in the `[horoscope]` section of your
 ### Sign selection lightbar
 
 - `lightbar_border_color`
-- `lightbar_item_color`
+- `lightbar_lowlight_color`
 - `lightbar_highlight_color`
 
 ### Horoscope header
