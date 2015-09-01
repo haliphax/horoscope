@@ -92,19 +92,13 @@ def main():
         :rtype: :class:`str`
         """
 
-        from logging import getLogger
-
         database = DBProxy('astrology', table='horoscope')
         nowdate = date.today()
-
-        log = getLogger('x84.engine')
 
         if 'horoscope' not in database:
             database['horoscope'] = {'date': None}
 
         if database['horoscope']['date'] != nowdate:
-            log.info(nowdate)
-            log.info(database['horoscope']['date'])
             req = None
 
             try:
