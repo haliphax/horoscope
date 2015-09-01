@@ -15,6 +15,7 @@ import requests
 
 # local
 from x84.bbs import getterminal, getsession, echo, Lightbar, DBProxy, getch
+from common import prompt_pager
 
 SIGNS = ('Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo', 'Libra',
          'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces',)
@@ -163,12 +164,13 @@ def main():
     monthly = u'{period} {horoscope}' \
               .format(period=term.bright_white('This month:'),
                       horoscope=horoscope['monthly'])
-    # TODO detect overflow and use pager_prompt
-    echo(u''.join((term.normal, term.clear, u'\r\n', sign[0].upper(), sign[1:],
-                   u'\r\n', term.blue(u'-' * len(sign)), u'\r\n',
-                   u'\r\n'.join(term.wrap(daily, term.width - 1)),
-                   u'\r\n\r\n',
-                   u'\r\n'.join(term.wrap(weekly, term.width - 1)),
-                   u'\r\n\r\n',
-                   u'\r\n'.join(term.wrap(monthly, term.width - 1)))))
+    echo(u''.join((term.normal, term.clear)))
+    output = u''.join((u'\r\n', sign[0].upper(), sign[1:], u'\r\n',
+                       term.blue(u'-' * len(sign)), u'\r\n',
+                       daily, u'\r\n\r\n',
+                       weekly, u'\r\n\r\n',
+                       monthly)).splitlines()
+    prompt_pager(output, end_prompt=False,
+                 colors={'highlight': term.bright_white,
+                         'lowlight': term.bright_blue})
     input_prompt()
