@@ -56,7 +56,7 @@ def main():
         :param str message: The error message to display
         """
 
-        echo(u''.join((term.normal, u'\r\n', message)))
+        echo(term.bright_red(message))
         term.inkey(timeout=3)
 
     def get_sign(force=False):
@@ -126,6 +126,10 @@ def main():
 
         if database['horoscope']['date'] != nowdate:
             req = None
+            echo(u''.join((term.normal, u'\r\n',
+                           getattr(term, PROMPT_LOWLIGHT_COLOR),
+                           u'Retrieving horoscope... ',
+                           term.normal)))
 
             try:
                 req = requests.get(
