@@ -22,7 +22,7 @@ from common import prompt_pager
 PROMPT_LOWLIGHT_COLOR = get_ini('horoscope', 'prompt_lowlight_color') or \
     u'bright_blue'
 PROMPT_HIGHLIGHT_COLOR = get_ini('horoscope', 'prompt_highlight_color') or \
-    u'bright_white'
+    u'bold_bright_white'
 LIGHTBAR_BORDER_COLOR = get_ini('horoscope', 'lightbar_border_color') or \
     u'blue'
 LIGHTBAR_LOWLIGHT_COLOR = get_ini('horoscope', 'lightbar_lowlight_color') or \
@@ -34,7 +34,7 @@ HEADER_HIGHLIGHT_COLOR = get_ini('horoscope', 'header_highlight_color') or \
 HEADER_LOWLIGHT_COLOR = get_ini('horoscope', 'header_lowlight_color') or \
     u'blue'
 TEXT_HIGHLIGHT_COLOR = get_ini('horoscope', 'text_highlight_color') or \
-    u'bright_white'
+    u'bold_underline_bright_white'
 TEXT_LOWLIGHT_COLOR = get_ini('horoscope', 'text_lowlight_color') or \
     u'white'
 
