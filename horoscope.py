@@ -189,28 +189,43 @@ def main():
         return
 
     daily = u'{period} {horoscope}' \
-            .format(period=getattr(term, TEXT_HIGHLIGHT_COLOR)('Today:'),
+            .format(period=getattr(term, TEXT_HIGHLIGHT_COLOR)(u'Today:'),
                     horoscope=getattr(term, TEXT_LOWLIGHT_COLOR)(
                         horoscope['daily']))
     weekly = u'{period} {horoscope}' \
-             .format(period=getattr(term, TEXT_HIGHLIGHT_COLOR)('This week:'),
+             .format(period=getattr(term, TEXT_HIGHLIGHT_COLOR)(u'This week:'),
                      horoscope=getattr(term, TEXT_LOWLIGHT_COLOR)(
                          horoscope['weekly']))
     monthly = u'{period} {horoscope}' \
-              .format(period=getattr(term, TEXT_HIGHLIGHT_COLOR)('This month:'),
-                      horoscope=getattr(term, TEXT_LOWLIGHT_COLOR)(
-                          horoscope['monthly']))
+              .format(period=getattr(term, TEXT_HIGHLIGHT_COLOR)(u'This month:'),
+                      horoscope=getattr(term, TEXT_LOWLIGHT_COLOR) +
+                          horoscope['monthly'])
     echo(u''.join((term.normal, term.clear)))
     output = u''.join((u'\r\n',
                        getattr(term, HEADER_HIGHLIGHT_COLOR)(
                            u''.join((sign[0].upper(), sign[1:]))),
                        u'\r\n',
                        getattr(term, HEADER_LOWLIGHT_COLOR)(u'-' * len(sign)),
-                       u'\r\n',
-                       daily, u'\r\n\r\n',
-                       weekly, u'\r\n\r\n',
-                       monthly)).splitlines()
-    prompt_pager(output, end_prompt=False, width=min(term.width - 1, 80),
+                       u'\r\n\r\n',))
+
+    wrapwidth = min(80, term.width - 1)
+
+    for line in term.wrap(daily, wrapwidth):
+        output += getattr(term, TEXT_LOWLIGHT_COLOR)(line) + u'\r\n'
+
+    output += u'\r\n'
+
+    for line in term.wrap(weekly, wrapwidth):
+        output += getattr(term, TEXT_LOWLIGHT_COLOR)(line) + u'\r\n'
+
+    output += u'\r\n'
+
+    for line in term.wrap(monthly, wrapwidth):
+        output += getattr(term, TEXT_LOWLIGHT_COLOR)(line) + u'\r\n'
+
+    wrapped = output.splitlines()
+
+    prompt_pager(wrapped, end_prompt=False, width=min(term.width - 1, 80),
                  colors={'highlight': getattr(term, PROMPT_HIGHLIGHT_COLOR),
                          'lowlight': getattr(term, PROMPT_LOWLIGHT_COLOR)})
     input_prompt()
