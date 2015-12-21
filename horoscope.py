@@ -48,6 +48,17 @@ def main():
     """ Script entry point. """
 
     term, session = getterminal(), getsession()
+    # colors
+    prompt_lowlight = getattr(term, PROMPT_LOWLIGHT_COLOR)
+    prompt_highlight = getattr(term, PROMPT_HIGHLIGHT_COLOR)
+    lightbar_border = getattr(term, LIGHTBAR_BORDER_COLOR)
+    lightbar_lowlight = getattr(term, LIGHTBAR_LOWLIGHT_COLOR)
+    lightbar_highlight = getattr(term, LIGHTBAR_HIGHLIGHT_COLOR)
+    header_highlight = getattr(term, HEADER_HIGHLIGHT_COLOR)
+    header_lowlight = getattr(term, HEADER_LOWLIGHT_COLOR)
+    text_highlight = getattr(term, TEXT_HIGHLIGHT_COLOR)
+    text_lowlight = getattr(term, TEXT_LOWLIGHT_COLOR)
+
 
     def error_message(message):
         """
@@ -74,11 +85,9 @@ def main():
 
         lbar = Lightbar(width=15, height=14, xloc=max(term.width / 2 - 7, 0),
                         yloc=max(term.height / 2 - 7, 0),
-                        colors={'border': getattr(term, LIGHTBAR_BORDER_COLOR),
-                                'highlight': getattr(term,
-                                                     LIGHTBAR_HIGHLIGHT_COLOR),
-                                'lowlight': getattr(term,
-                                                    LIGHTBAR_LOWLIGHT_COLOR)},
+                        colors={'border': lightbar_border,
+                                'highlight': lightbar_highlight,
+                                'lowlight': lightbar_lowlight},
                         glyphs={'top-left': u'+', 'top-right': u'+',
                                 'top-horiz': u'-', 'bot-horiz': u'-',
                                 'bot-left': u'+', 'bot-right': u'+',
@@ -126,10 +135,8 @@ def main():
 
         if database['horoscope']['date'] != nowdate:
             req = None
-            echo(u''.join((term.normal, u'\r\n',
-                           getattr(term, PROMPT_LOWLIGHT_COLOR),
-                           u'Retrieving horoscope... ',
-                           term.normal)))
+            echo(u''.join((term.normal, u'\r\n', prompt_lowlight,
+                           u'Retrieving horoscope... ', term.normal)))
 
             try:
                 req = requests.get(
@@ -166,12 +173,11 @@ def main():
 
         echo(u''.join((term.normal, u'\r\n\r\n',
                        term.move_x(max(term.width / 2 - 40, 0)),
-                       getattr(term, PROMPT_LOWLIGHT_COLOR)(u'Press '),
-                       getattr(term, PROMPT_HIGHLIGHT_COLOR)(u'!'),
-                       getattr(term, PROMPT_LOWLIGHT_COLOR)(
-                           u' to change your sign or '),
-                       getattr(term, PROMPT_HIGHLIGHT_COLOR)(u'any other key'),
-                       getattr(term, PROMPT_LOWLIGHT_COLOR)(u' to continue'))))
+                       prompt_lowlight(u'Press '),
+                       prompt_highlight(u'!'),
+                       prompt_lowlight(u' to change your sign or '),
+                       prompt_highlight(u'any other key'),
+                       prompt_lowlight(u' to continue'))))
         inp = getch()
 
         if inp == u'!':
@@ -189,43 +195,39 @@ def main():
         return
 
     daily = u'{period} {horoscope}' \
-            .format(period=getattr(term, TEXT_HIGHLIGHT_COLOR)(u'Today:'),
-                    horoscope=getattr(term, TEXT_LOWLIGHT_COLOR)(
-                        horoscope['daily']))
+            .format(period=text_highlight(u'Today:'),
+                    horoscope=text_lowlight(horoscope['daily']))
     weekly = u'{period} {horoscope}' \
-             .format(period=getattr(term, TEXT_HIGHLIGHT_COLOR)(u'This week:'),
-                     horoscope=getattr(term, TEXT_LOWLIGHT_COLOR)(
-                         horoscope['weekly']))
+             .format(period=text_highlight(u'This week:'),
+                     horoscope=text_lowlight(horoscope['weekly']))
     monthly = u'{period} {horoscope}' \
-              .format(period=getattr(term, TEXT_HIGHLIGHT_COLOR)(u'This month:'),
-                      horoscope=getattr(term, TEXT_LOWLIGHT_COLOR) +
-                          horoscope['monthly'])
+              .format(period=text_highlight(u'This month:'),
+                      horoscope=text_lowlight(horoscope['monthly']))
     echo(u''.join((term.normal, term.clear)))
     output = u''.join((u'\r\n',
-                       getattr(term, HEADER_HIGHLIGHT_COLOR)(
-                           u''.join((sign[0].upper(), sign[1:]))),
+                       header_highlight(u''.join((sign[0].upper(), sign[1:]))),
                        u'\r\n',
-                       getattr(term, HEADER_LOWLIGHT_COLOR)(u'-' * len(sign)),
+                       header_lowlight(u'-' * len(sign)),
                        u'\r\n\r\n',))
 
     wrapwidth = min(80, term.width - 1)
 
     for line in term.wrap(daily, wrapwidth):
-        output += getattr(term, TEXT_LOWLIGHT_COLOR)(line) + u'\r\n'
+        output += text_lowlight(line) + u'\r\n'
 
     output += u'\r\n'
 
     for line in term.wrap(weekly, wrapwidth):
-        output += getattr(term, TEXT_LOWLIGHT_COLOR)(line) + u'\r\n'
+        output += text_lowlight(line) + u'\r\n'
 
     output += u'\r\n'
 
     for line in term.wrap(monthly, wrapwidth):
-        output += getattr(term, TEXT_LOWLIGHT_COLOR)(line) + u'\r\n'
+        output += text_lowlight(line) + u'\r\n'
 
     wrapped = output.splitlines()
 
     prompt_pager(wrapped, end_prompt=False, width=min(term.width - 1, 80),
-                 colors={'highlight': getattr(term, PROMPT_HIGHLIGHT_COLOR),
-                         'lowlight': getattr(term, PROMPT_LOWLIGHT_COLOR)})
+                 colors={'highlight': prompt_highlight,
+                         'lowlight': prompt_lowlight})
     input_prompt()
