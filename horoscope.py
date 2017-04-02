@@ -139,16 +139,15 @@ def main():
                            u'Retrieving horoscope... ', term.normal)))
 
             try:
-                req = requests.get(
-                    'http://www.api.littleastro.com/restserver/index.php'
-                    '/api/horoscope/readings/format/json')
+                req = requests.get('http://www.api.littleastro.com/public/'
+                                   'xiaoerge_haliphax_horoscope.php')
             except requests.exceptions.RequestException:
                 return error_message(u'Error retrieving horoscope.')
 
             response = None
 
             try:
-                response = json.loads(req.text)
+                response = json.loads(req.text)['data']
             except TypeError:
                 return error_message(u'Error parsing response.')
 
