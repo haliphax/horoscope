@@ -201,7 +201,8 @@ def main():
                      horoscope=text_lowlight(horoscope['weekly']))
     monthly = u'{period} {horoscope}' \
               .format(period=text_highlight(u'This month:'),
-                      horoscope=text_lowlight(horoscope['monthly']))
+                      horoscope=text_lowlight(horoscope['monthly']
+                                              .replace('<br>', ' ')))
     echo(u''.join((term.normal, term.clear)))
     output = u''.join((u'\r\n',
                        header_highlight(u''.join((sign[0].upper(), sign[1:]))),
