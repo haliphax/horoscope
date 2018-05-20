@@ -7,7 +7,6 @@ horoscope from the littleastro.com web API.
 __author__ = u'haliphax <https://github.com/haliphax>'
 
 # stdlib
-import json
 from datetime import date
 
 # 3rd party
@@ -42,7 +41,6 @@ SIGNS = ('Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo', 'Libra',
          'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces',)
 
 
-
 # pylint: disable=I0011,R0912
 def main():
     """ Script entry point. """
@@ -58,7 +56,6 @@ def main():
     header_lowlight = getattr(term, HEADER_LOWLIGHT_COLOR)
     text_highlight = getattr(term, TEXT_HIGHLIGHT_COLOR)
     text_lowlight = getattr(term, TEXT_LOWLIGHT_COLOR)
-
 
     def error_message(message):
         """
@@ -119,6 +116,17 @@ def main():
 
         return sign
 
+    def clean_horoscope(text):
+        """
+        Fix <br> tags and bad unicode apostrophes in the horoscope text.
+
+        :param str text: The text to be cleaned up
+        :rtype: :class:`str`
+        """
+
+        return (text.replace(u'<br>', u'\r\n')
+                    .replace(u'\u009d\u009d\u009d', u"'"))
+
     def get_horoscope(sign):
         """
         Retrieve the horoscope for the user's selected astrological sign.
@@ -147,7 +155,7 @@ def main():
             response = None
 
             try:
-                response = json.loads(req.text)['data']
+                response = req.json()['data']
             except TypeError:
                 return error_message(u'Error parsing response.')
 
@@ -156,7 +164,10 @@ def main():
                     for element in response:
                         horoscope = {'daily': element['Daily_Horoscope'],
                                      'weekly': element['Weekly_Horoscope'],
-                                     'monthly': element['Monthly_Horoscope']}
+                                     'monthly': element['Monthly_Horoscope'],
+                                     'love': element['Love'],
+                                     'career': element['Career'],
+                                     'health': element['Wellness'],}
                         database[element['Sign']] = horoscope
                 except KeyError:
                     return error_message(u'Invalid response.')
@@ -193,6 +204,8 @@ def main():
     if not horoscope:
         return
 
+    # TODO do a loop here or something... too much repetition
+
     daily = u'{period} {horoscope}' \
             .format(period=text_highlight(u'Today:'),
                     horoscope=text_lowlight(horoscope['daily']))
@@ -201,8 +214,16 @@ def main():
                      horoscope=text_lowlight(horoscope['weekly']))
     monthly = u'{period} {horoscope}' \
               .format(period=text_highlight(u'This month:'),
-                      horoscope=text_lowlight(horoscope['monthly']
-                                              .replace('<br>', ' ')))
+                      horoscope=text_lowlight(horoscope['monthly']))
+    love = u'{period} {horoscope}' \
+              .format(period=text_highlight(u'Love:'),
+                      horoscope=text_lowlight(horoscope['love']))
+    career = u'{period} {horoscope}' \
+              .format(period=text_highlight(u'Career:'),
+                      horoscope=text_lowlight(horoscope['career']))
+    health = u'{period} {horoscope}' \
+              .format(period=text_highlight(u'Health:'),
+                      horoscope=text_lowlight(horoscope['health']))
     echo(u''.join((term.normal, term.clear)))
     output = u''.join((u'\r\n',
                        header_highlight(u''.join((sign[0].upper(), sign[1:]))),
@@ -210,20 +231,17 @@ def main():
                        header_lowlight(u'-' * len(sign)),
                        u'\r\n\r\n',))
 
-    wrapwidth = min(80, term.width - 1)
+    wrapwidth = min(79, term.width - 1)
+    first = True
 
-    for line in term.wrap(daily, wrapwidth):
-        output += text_lowlight(line) + u'\r\n'
+    for chunk in (daily, weekly, monthly, love, career, health,):
+        if first:
+            first = False
+        else:
+            output += u'\r\n'
 
-    output += u'\r\n'
-
-    for line in term.wrap(weekly, wrapwidth):
-        output += text_lowlight(line) + u'\r\n'
-
-    output += u'\r\n'
-
-    for line in term.wrap(monthly, wrapwidth):
-        output += text_lowlight(line) + u'\r\n'
+        for line in term.wrap(clean_horoscope(chunk), wrapwidth):
+            output += text_lowlight(line) + u'\r\n'
 
     wrapped = output.splitlines()
 
