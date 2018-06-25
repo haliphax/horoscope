@@ -8,6 +8,7 @@ __author__ = u'haliphax <https://github.com/haliphax>'
 
 # stdlib
 from datetime import date
+import json
 
 # 3rd party
 import requests
@@ -155,7 +156,7 @@ def main():
             response = None
 
             try:
-                response = req.json()['data']
+                response = json.loads(req.text)['data']
             except TypeError:
                 return error_message(u'Error parsing response.')
 
